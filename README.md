@@ -51,12 +51,19 @@ We've now seen how simple it is to run Consul, add nodes and services, and query
 ### Defining Checks
 
 On n2 node:
-- `echo '{"check": {"name": "ping",
+- 
+  ```
+  echo '{"check": {"name": "ping",
   "args": ["ping", "-c1", "google.com"], "interval": "30s"}}' \
-  >/vagrant/consul.d/ping.json`
-- `echo '{"service": {"name": "web", "tags": ["rails"], "port": 80,
+  >/vagrant/consul.d/ping.json
+  ```
+  
+- 
+  ```
+  echo '{"service": {"name": "web", "tags": ["rails"], "port": 80,
   "check": {"args": ["curl", "localhost"], "interval": "10s"}}}' \
-  >/vagrant/consul.d/web.json`
+  >/vagrant/consul.d/web.json
+  ```
 
 - `consul reload`
 
