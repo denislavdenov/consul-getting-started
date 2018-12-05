@@ -43,3 +43,35 @@ On n1 node:
 # Leaving a Cluster
 
 To leave the cluster, you can either gracefully quit an agent (using Ctrl-C) or force kill one of the agents. Gracefully leaving allows the node to transition into the left state; otherwise, other nodes will detect it as having failed.
+
+# Registering Health Checks
+
+We've now seen how simple it is to run Consul, add nodes and services, and query those nodes and services. In this section, we will continue our tour by adding health checks to both nodes and services. 
+
+### Defining Checks
+
+On n2 node:
+- `echo '{"check": {"name": "ping",
+  "args": ["ping", "-c1", "google.com"], "interval": "30s"}}' \
+  >/vagrant/consul.d/ping.json`
+- `echo '{"service": {"name": "web", "tags": ["rails"], "port": 80,
+  "check": {"args": ["curl", "localhost"], "interval": "10s"}}}' \
+  >/vagrant/consul.d/web.json`
+
+- `consul reload`
+
+After restarting the second agent you should see the following log lines:
+
+```
+==> Starting Consul agent...
+...
+    [INFO] agent: Synced service 'web'
+    [INFO] agent: Synced check 'service:web'
+    [INFO] agent: Synced check 'ping'
+    [WARN] Check 'service:web' is now critical
+```
+
+If not, do `consul reload` on n1 too.
+
+The first few lines indicate that the agent has synced the new definitions. The last line indicates that the check we added for the web service is critical. This is because we're not actually running a web server, so the curl test is failing!
+
